@@ -1,50 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles.css">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-        <title>Memory Matching - Setup</title>
-    </head>
-    
-    <body>
-        <header>
-            <h1>Memory Matching</h1>
-        </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Memory Matching - Setup</title>
+  </head>
 
-        <div class="setup-container">
-            <form id="setupForm" class="setup-form">
-                <h2>Game Setup</h2>
-            
-                <div class="input-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" required placeholder="Enter your name">
-                </div>
+  <body>
+    <header>
+      <h1>Memory Matching</h1>
+    </header>
 
-                <div class="input-group">
-                    <label for="retries">Maximum Retries:</label>
-                    <input type="number" id="retries" min="1" required placeholder="e.g. 10">
-                </div>
+    <div class="setup-container">
+      <form id="setupForm" class="setup-form">
+        <h2>Game Setup</h2>
 
-                <div class="input-group checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="enableTimer">
-                        Enable Timer?
-                    </label>
-                </div>
-
-                <div class="input-group" id="timerGroup" style="display: none;">
-                    <label for="timerDuration">Timer Duration (seconds):</label>
-                    <input type="number" id="timerDuration" min="10" placeholder="e.g. 60">
-                </div>
-
-                <button type="submit">Start Game</button>
-            </form>
+        <div class="input-group">
+          <label for="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            required
+            placeholder="Enter your name"
+          />
         </div>
 
-        <script src="setup.js"></script>
-    </body>
+        <div class="input-group">
+          <label for="retries">Maximum Retries:</label>
+          <input
+            type="number"
+            id="retries"
+            min="1"
+            required
+            placeholder="e.g. 10"
+          />
+        </div>
+
+        <div class="input-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="enableTimer" />
+            Enable Timer?
+          </label>
+        </div>
+
+        <div class="input-group" id="timerGroup" style="display: none">
+          <label for="timerDuration">Timer Duration (seconds):</label>
+          <input
+            type="number"
+            id="timerDuration"
+            min="10"
+            placeholder="e.g. 60"
+          />
+        </div>
+
+        <button type="submit">Start Game</button>
+      </form>
+    </div>
+
+    <script src="setup.js"></script>
+  </body>
 </html>

@@ -1,28 +1,26 @@
-// LOAD SETTINGS FROM SETUP
+// Load Settings From setup.js
 const username = sessionStorage.getItem("username");
 const maxRetries = parseInt(sessionStorage.getItem("maxRetries"));
 const timerEnabled = sessionStorage.getItem("timerEnabled") === "true";
 const timerDuration = parseInt(sessionStorage.getItem("timerDuration"));
 
 if (!username || !maxRetries || (timerEnabled && !timerDuration)) {
-    window.location.href = "index.html";
+  window.location.href = "index.html";
 }
 
-document.getElementById("winMessage").textContent = `Congratulations, ${username}!`;
-
-// CARD DATA
+// Card Data
 const cardPairs = [
-    { id: 1, value: "images/cat.png" },
-    { id: 2, value: "images/crab.png" },
-    { id: 3, value: "images/dog.png" },
-    { id: 4, value: "images/fish.png" },
-    { id: 5, value: "images/moon.png" },
-    { id: 6, value: "images/sun.png" },
+  { id: 1, value: "images/cat.png" },
+  { id: 2, value: "images/crab.png" },
+  { id: 3, value: "images/dog.png" },
+  { id: 4, value: "images/fish.png" },
+  { id: 5, value: "images/moon.png" },
+  { id: 6, value: "images/sun.png" },
 ];
 
 let cards = [];
 
-// GAME VARIABLES
+// Game Variables
 let firstCard = null;
 let secondCard = null;
 let canFlip = true;
@@ -41,337 +39,347 @@ let timerRunning = false;
 let secondPickTimer = null;
 let missOpportunityThisMove = false;
 
-// CREATE CARDS ARRAY
-function createCards() {
-    cards = [];
-    let uniqueCardId = 1;
-
-    cardPairs.forEach((pair) => {
-        cards.push({
-            cardId: uniqueCardId++,
-            id: pair.id,
-            value: pair.value,
-            state: "hidden",
-        });
-
-        cards.push({
-            cardId: uniqueCardId++,
-            id: pair.id,
-            value: pair.value,
-            state: "hidden",
-        });
-    });
-
-    cards.sort(() => Math.random() - 0.5);
+// Helper Functions
+function stopTimers() {
+  clearInterval(timerInterval);
+  clearTimeout(secondPickTimer);
 }
 
-// GET CARD ELEMENT
 function getCardElement(cardId) {
-    return document.querySelector(`[data-card-id="${cardId}"]`);
+  return document.querySelector(`[data-card-id="${cardId}"]`);
 }
 
-// GET KNOWN UNMATCHED PAIRS
-function getKnownUnmatchedPairs() {
-    const counts = {};
-
-    cards.forEach(card => {
-        if (seenCards.has(card.cardId) && card.state !== "matched") {
-            counts[card.id] = (counts[card.id] || 0) + 1;
-        }
-    });
-
-    return Object.keys(counts).filter(id => counts[id] === 2);
+function getSelectedCardElements() {
+  return {
+    firstCardElement: firstCard ? getCardElement(firstCard.cardId) : null,
+    secondCardElement: secondCard ? getCardElement(secondCard.cardId) : null,
+  };
 }
 
-function wouldFirstClickCreateKnownPair(card) {
-    if (!card || card.state === "matched") return false;
-
-    const seenSamePair = cards.filter(other =>
-        other.cardId !== card.cardId &&
-        other.id === card.id &&
-        seenCards.has(other.cardId) &&
-        other.state !== "matched"
-    );
-
-    return seenSamePair.length > 0;
+function updateSelectedCardClasses(action, ...classes) {
+  const { firstCardElement, secondCardElement } = getSelectedCardElements();
+  firstCardElement?.classList[action](...classes);
+  secondCardElement?.classList[action](...classes);
 }
 
-// START GAME
-function startGame() {
-    const board = document.getElementById("gameBoard");
-    board.innerHTML = "";
-
-    resetGameState();
-    createCards();
-
-    cards.forEach((card) => {
-        const cardElement = document.createElement("div");
-        cardElement.className = "card";
-        cardElement.dataset.cardId = card.cardId;
-
-        cardElement.innerHTML = `
-        <div class="card-front">?</div>
-        <div class="card-back">
-            <img src="${card.value}" alt="Memory card image">
-        </div>
-        `;
-
-        cardElement.onclick = flipCard;
-        board.appendChild(cardElement);
-    });
-
-    showPreview();
-}
-
-// PREVIEW
-function showPreview() {
-    canFlip = false;
-
-    cards.forEach((card) => {
-        card.state = "flipped";
-        getCardElement(card.cardId)?.classList.add("flipped");
-    });
-
-    setTimeout(() => {
-        cards.forEach((card) => {
-            card.state = "hidden";
-            getCardElement(card.cardId)?.classList.remove("flipped");
-        });
-
-        canFlip = true;
-    }, 700);
-}
-
-// FLIP CARD
-function flipCard() {
-    if (!canFlip) return;
-
-    const clickedCardId = Number(this.dataset.cardId);
-    const clickedCard = cards.find(c => c.cardId === clickedCardId);
-
-    if (!clickedCard) return;
-    if (clickedCard.state === "flipped" || clickedCard.state === "matched") return;
-
-    if (!timerRunning) startTimer();
-
-    // mark as seen
-    seenCards.add(clickedCard.cardId);
-
-    clickedCard.state = "flipped";
-    this.classList.add("flipped");
-
-    // FIRST CARD
-    if (!firstCard) {
-        const knownPairsBeforeMove = getKnownUnmatchedPairs();
-
-        missOpportunityThisMove =
-            knownPairsBeforeMove.length > 0 || wouldFirstClickCreateKnownPair(clickedCard);
-
-        firstCard = clickedCard;
-
-        secondPickTimer = setTimeout(() => {
-            if (firstCard && firstCard.state === "flipped") {
-                firstCard.state = "hidden";
-                getCardElement(firstCard.cardId)?.classList.remove("flipped");
-                firstCard = null;
-                missOpportunityThisMove = false;
-            }
-        }, 10000);
-
-        return;
-    }
-
-    // SECOND CARD
-    secondCard = clickedCard;
-    clearTimeout(secondPickTimer);
-
-    canFlip = false;
-    checkMatch();
-}
-
-// CHECK MATCH
-function checkMatch() {
-    const isMatch = firstCard.id === secondCard.id;
-
-    if (isMatch) {
-        setTimeout(() => {
-            firstCard.state = "matched";
-            secondCard.state = "matched";
-
-            const firstCardElement = getCardElement(firstCard.cardId);
-            const secondCardElement = getCardElement(secondCard.cardId);
-
-            firstCardElement?.classList.add("matched", "just-matched");
-            secondCardElement?.classList.add("matched", "just-matched");
-
-            setTimeout(() => {
-                firstCardElement?.classList.remove("just-matched");
-                secondCardElement?.classList.remove("just-matched");
-            }, 350);
-
-            matches++;
-            updateStats();
-            resetCards();
-
-            if (matches === cardPairs.length) winGame();
-        }, 500);
-    } else {
-        failures++;
-        updateStats();
-
-        if (failures >= maxRetries) {
-            loseGame();
-            return;
-        }
-
-        const firstCardElement = getCardElement(firstCard.cardId);
-        const secondCardElement = getCardElement(secondCard.cardId);
-
-        firstCardElement?.classList.add("mismatch");
-        secondCardElement?.classList.add("mismatch");
-
-        setTimeout(() => {
-            firstCard.state = "hidden";
-            secondCard.state = "hidden";
-
-            firstCardElement?.classList.remove("flipped", "mismatch");
-            secondCardElement?.classList.remove("flipped", "mismatch");
-
-            // MISS LOGIC
-            if (missOpportunityThisMove) {
-                misses++;
-            }
-
-            updateStats();
-            resetCards();
-        }, 1000);
-    }
-}
-
-// RESET CARDS
-function resetCards() {
-    firstCard = null;
-    secondCard = null;
-    canFlip = true;
-    missOpportunityThisMove = false;
-}
-
-// TIMER
-function startTimer() {
-    timerRunning = true;
-
-    timerInterval = setInterval(() => {
-        elapsedSeconds++;
-
-        if (timerEnabled) {
-            seconds--;
-
-            if (seconds <= 0) {
-                seconds = 0;
-                updateStats();
-                loseGame();
-                return;
-            }
-        } else {
-            seconds++;
-        }
-
-        updateStats();
-    }, 1000);
-}
-
-// UPDATE UI
-function updateStats() {
-    document.getElementById("retries").textContent = `${failures}/${maxRetries}`;
-    document.getElementById("misses").textContent = misses;
-    document.getElementById("matches").textContent = `${matches}/${cardPairs.length}`;
-
-    let mins = Math.floor(seconds / 60);
-    let secs = seconds % 60;
-    if (secs < 10) secs = "0" + secs;
-
-    document.getElementById("time").textContent = `${mins}:${secs}`;
+function setAllCardsState(state, classAction) {
+  cards.forEach((card) => {
+    card.state = state;
+    getCardElement(card.cardId)?.classList[classAction]("flipped");
+  });
 }
 
 function formatDisplayTime(totalSeconds) {
-    let mins = Math.floor(totalSeconds / 60);
-    let secs = totalSeconds % 60;
-    if (secs < 10) secs = "0" + secs;
-    return `${mins}:${secs}`;
+  let mins = Math.floor(totalSeconds / 60);
+  let secs = totalSeconds % 60;
+  if (secs < 10) secs = "0" + secs;
+  return `${mins}:${secs}`;
+}
+
+function shuffleCards(cardsArray) {
+  for (let i = cardsArray.length - 1; i > 0; i--) {
+    const randIndex = Math.floor(Math.random() * (i + 1));
+    [cardsArray[i], cardsArray[randIndex]] = [
+      cardsArray[randIndex],
+      cardsArray[i],
+    ];
+  }
+}
+
+// Create Cards Array
+function createCards() {
+  let uniqueCardId = 1;
+
+  cards = cardPairs.flatMap((pair) => [
+    {
+      cardId: uniqueCardId++,
+      id: pair.id,
+      value: pair.value,
+      state: "hidden",
+    },
+    {
+      cardId: uniqueCardId++,
+      id: pair.id,
+      value: pair.value,
+      state: "hidden",
+    },
+  ]);
+
+  shuffleCards(cards);
+}
+
+// Get Known Unmatched Pairs (For Misses Counter)
+function getKnownUnmatchedPairs() {
+  const counts = {};
+
+  cards.forEach((card) => {
+    if (seenCards.has(card.cardId) && card.state !== "matched") {
+      counts[card.id] = (counts[card.id] || 0) + 1;
+    }
+  });
+
+  return Object.keys(counts).filter((id) => counts[id] === 2);
+}
+
+function wouldFirstClickCreateKnownPair(card) {
+  if (!card || card.state === "matched") return false;
+
+  const seenSamePair = cards.filter(
+    (other) =>
+      other.cardId !== card.cardId &&
+      other.id === card.id &&
+      seenCards.has(other.cardId) &&
+      other.state !== "matched",
+  );
+
+  return seenSamePair.length > 0;
+}
+
+// Start Game
+function startGame() {
+  const board = document.getElementById("gameBoard");
+  board.innerHTML = "";
+
+  resetGameState();
+  createCards();
+
+  cards.forEach((card) => {
+    const cardElement = document.createElement("div");
+    cardElement.className = "card";
+    cardElement.dataset.cardId = card.cardId;
+
+    cardElement.innerHTML = `
+      <div class="card-front">?</div>
+      <div class="card-back">
+        <img src="${card.value}" alt="Memory card image">
+      </div>
+    `;
+
+    cardElement.onclick = flipCard;
+    board.appendChild(cardElement);
+  });
+
+  showPreview();
+}
+
+// Preview
+function showPreview() {
+  canFlip = false;
+  setAllCardsState("flipped", "add");
+
+  setTimeout(() => {
+    setAllCardsState("hidden", "remove");
+    canFlip = true;
+  }, 700);
+}
+
+// Flip Card
+function flipCard() {
+  if (!canFlip) return;
+
+  const clickedCardId = Number(this.dataset.cardId);
+  const clickedCard = cards.find((c) => c.cardId === clickedCardId);
+
+  if (!clickedCard) return;
+  if (clickedCard.state === "flipped" || clickedCard.state === "matched")
+    return;
+
+  if (!timerRunning) startTimer();
+
+  seenCards.add(clickedCard.cardId);
+
+  clickedCard.state = "flipped";
+  this.classList.add("flipped");
+
+  // First Card
+  if (!firstCard) {
+    const knownPairsBeforeMove = getKnownUnmatchedPairs();
+
+    missOpportunityThisMove =
+      knownPairsBeforeMove.length > 0 ||
+      wouldFirstClickCreateKnownPair(clickedCard);
+
+    firstCard = clickedCard;
+
+    secondPickTimer = setTimeout(() => {
+      if (firstCard && firstCard.state === "flipped") {
+        firstCard.state = "hidden";
+        getCardElement(firstCard.cardId)?.classList.remove("flipped");
+        firstCard = null;
+        missOpportunityThisMove = false;
+      }
+    }, 10000);
+
+    return;
+  }
+
+  // Second Card
+  secondCard = clickedCard;
+  clearTimeout(secondPickTimer);
+
+  canFlip = false;
+  checkMatch();
+}
+
+// Check Match
+function checkMatch() {
+  const isMatch = firstCard.id === secondCard.id;
+
+  if (isMatch) {
+    setTimeout(() => {
+      firstCard.state = "matched";
+      secondCard.state = "matched";
+
+      updateSelectedCardClasses("add", "matched", "just-matched");
+
+      setTimeout(() => {
+        updateSelectedCardClasses("remove", "just-matched");
+      }, 350);
+
+      matches++;
+      updateStats();
+      resetCards();
+
+      if (matches === cardPairs.length) winGame();
+    }, 500);
+  } else {
+    failures++;
+    updateStats();
+
+    if (failures >= maxRetries) {
+      loseGame();
+      return;
+    }
+
+    updateSelectedCardClasses("add", "mismatch");
+
+    setTimeout(() => {
+      firstCard.state = "hidden";
+      secondCard.state = "hidden";
+
+      updateSelectedCardClasses("remove", "flipped", "mismatch");
+
+      if (missOpportunityThisMove) {
+        misses++;
+      }
+
+      updateStats();
+      resetCards();
+    }, 1000);
+  }
+}
+
+// Reset Cards
+function resetCards() {
+  firstCard = null;
+  secondCard = null;
+  canFlip = true;
+  missOpportunityThisMove = false;
+}
+
+// Timer
+function startTimer() {
+  timerRunning = true;
+
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+
+    if (timerEnabled) {
+      seconds--;
+
+      if (seconds <= 0) {
+        seconds = 0;
+        updateStats();
+        loseGame();
+        return;
+      }
+    } else {
+      seconds++;
+    }
+
+    updateStats();
+  }, 1000);
+}
+
+// Update UI
+function updateStats() {
+  document.getElementById("retries").textContent = `${failures}/${maxRetries}`;
+  document.getElementById("misses").textContent = misses;
+  document.getElementById("matches").textContent =
+    `${matches}/${cardPairs.length}`;
+  document.getElementById("time").textContent = formatDisplayTime(seconds);
 }
 
 function getStatsHTML() {
-    return `
-        <div class="dialog-stat-row"><span>Matches</span><span>${matches}/${cardPairs.length}</span></div>
-        <div class="dialog-stat-row"><span>Retries</span><span>${failures}/${maxRetries}</span></div>
-        <div class="dialog-stat-row"><span>Misses</span><span>${misses}</span></div>
-        <div class="dialog-stat-row"><span>Time Taken</span><span>${formatDisplayTime(elapsedSeconds)}</span></div>
-    `;
+  return `
+    <div class="dialog-stat-row"><span>Matches</span><span>${matches}/${cardPairs.length}</span></div>
+    <div class="dialog-stat-row"><span>Retries</span><span>${failures}/${maxRetries}</span></div>
+    <div class="dialog-stat-row"><span>Misses</span><span>${misses}</span></div>
+    <div class="dialog-stat-row"><span>Time Taken</span><span>${formatDisplayTime(elapsedSeconds)}</span></div>
+  `;
 }
 
-// WIN / LOSE
+// Win / Lose
 function winGame() {
-    clearInterval(timerInterval);
-    clearTimeout(secondPickTimer);
-    canFlip = false;
+  stopTimers();
+  canFlip = false;
 
-    document.getElementById("winStats").innerHTML = getStatsHTML();
+  document.getElementById("winMessage").textContent =
+    `Congratulations, ${username}!`;
+  document.getElementById("winStats").innerHTML = getStatsHTML();
 
-    setTimeout(() => {
-        document.getElementById("winModal").classList.remove("hidden");
-    }, 300);
+  setTimeout(() => {
+    document.getElementById("winModal").classList.remove("hidden");
+  }, 300);
 }
 
 function loseGame() {
-    clearInterval(timerInterval);
-    clearTimeout(secondPickTimer);
-    canFlip = false;
+  stopTimers();
+  canFlip = false;
 
-    document.getElementById("loseStats").innerHTML = getStatsHTML();
+  document.getElementById("loseStats").innerHTML = getStatsHTML();
 
-    setTimeout(() => {
-        document.getElementById("loseModal").classList.remove("hidden");
-    }, 300);
+  setTimeout(() => {
+    document.getElementById("loseModal").classList.remove("hidden");
+  }, 300);
 }
 
-// RESTART
+// Restart
 function restartGame() {
-    clearInterval(timerInterval);
-    clearTimeout(secondPickTimer);
+  stopTimers();
 
-    document.getElementById("winModal").classList.add("hidden");
-    document.getElementById("loseModal").classList.add("hidden");
+  document.getElementById("winModal").classList.add("hidden");
+  document.getElementById("loseModal").classList.add("hidden");
 
-    startGame();
+  startGame();
 }
 
-// RESET STATE
+// Reset State
 function resetGameState() {
-    clearInterval(timerInterval);
-    clearTimeout(secondPickTimer);
+  stopTimers();
 
-    firstCard = null;
-    secondCard = null;
-    canFlip = true;
-    missOpportunityThisMove = false;
+  firstCard = null;
+  secondCard = null;
+  canFlip = true;
+  missOpportunityThisMove = false;
 
-    matches = 0;
-    failures = 0;
-    misses = 0;
+  matches = 0;
+  failures = 0;
+  misses = 0;
 
-    seenCards.clear();
+  seenCards.clear();
 
-    seconds = timerEnabled ? timerDuration : 0;
-    elapsedSeconds = 0;
-    timerRunning = false;
+  seconds = timerEnabled ? timerDuration : 0;
+  elapsedSeconds = 0;
+  timerRunning = false;
 
-    updateStats();
+  updateStats();
 }
 
 function resetGame() {
-    sessionStorage.clear();
-    window.location.href = "index.html";
+  sessionStorage.clear();
+  window.location.href = "index.html";
 }
 
-// START
+// Start
 startGame();

@@ -1,3 +1,19 @@
+:root {
+    --bg-dark: #292C34;
+    --white: #ffffff;
+    --accent: #E2584D;
+    --accent-hover: #c94c42;
+    --win: #4dcc7d;
+    --lose: #fc121b;
+    --dialog-bg: #f5f5f5;
+    --card-front-top: #4d4e56;
+    --card-front-bottom: #43444b;
+    --border-light: #d9d9d9;
+    --divider-light: #dddddd;
+    --body-font: "Outfit", "Asap", sans-serif;
+    --title-font: "Asap", sans-serif;
+}
+
 /* Global */
 * {
     margin: 0;
@@ -6,25 +22,46 @@
 }
 
 body {
-    background-color: #292C34;
+    background-color: var(--bg-dark);
     position: relative;
     min-height: 100vh;
     overflow-x: hidden;
-    font-family: "Outfit", "Asap", sans-serif;
+    font-family: var(--body-font);
 }
 
 /* Header */
 header {
-    background: #ffffff;
+    background: var(--white);
     padding: 16px 20px;
 }
 
 header > h1 {
-    color: #292C34;
+    color: var(--bg-dark);
     text-align: center;
-    font-family: "Asap", sans-serif;
+    font-family: var(--title-font);
     font-size: 32px;
     letter-spacing: 0.5px;
+}
+
+/* Shared buttons */
+.btn,
+.setup-form button,
+.dialog-content button {
+    border: none;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--white);
+    font-size: 18px;
+    font-weight: bold;
+    font-family: var(--body-font);
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn:hover,
+.setup-form button:hover,
+.dialog-content button:hover {
+    background: var(--accent-hover);
 }
 
 /* Setup Page */
@@ -39,12 +76,10 @@ header > h1 {
 .setup-form {
     width: 90%;
     max-width: 420px;
-    border: 3px solid #ffffff;
+    border: 3px solid var(--white);
     border-radius: 6px;
     padding: 30px;
-    background-color: transparent;
-    color: #ffffff;
-    font-family: "Outfit", "Asap", sans-serif;
+    color: var(--white);
 }
 
 .setup-form h2 {
@@ -53,7 +88,8 @@ header > h1 {
     font-size: 32px;
 }
 
-.input-group {
+.input-group,
+.checkbox-group {
     margin-bottom: 20px;
 }
 
@@ -68,10 +104,10 @@ header > h1 {
 .setup-form input[type="number"] {
     width: 100%;
     padding: 12px;
-    border: 2px solid #ffffff;
+    border: 2px solid var(--white);
     border-radius: 4px;
     font-size: 16px;
-    font-family: "Outfit", "Asap", sans-serif;
+    font-family: var(--body-font);
     outline: none;
 }
 
@@ -80,10 +116,6 @@ header > h1 {
 .setup-form input[type="text"]:focus,
 .setup-form input[type="number"]:focus {
     background: #ffffe0;
-}
-
-.checkbox-group {
-    margin-bottom: 20px;
 }
 
 .checkbox-label {
@@ -103,19 +135,6 @@ header > h1 {
 .setup-form button {
     width: 100%;
     padding: 12px;
-    border: none;
-    border-radius: 4px;
-    background: #E2584D;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: bold;
-    font-family: "Outfit", "Asap", sans-serif;
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.setup-form button:hover {
-    background: #c94c42;
 }
 
 /* Game Page */
@@ -128,10 +147,9 @@ header > h1 {
 .boardHeader {
     width: fit-content;
     margin: 0 auto 24px;
-    border: 3px solid #ffffff;
+    border: 3px solid var(--white);
     border-radius: 6px;
     padding: 14px 18px;
-    background: transparent;
 }
 
 .stats {
@@ -144,12 +162,11 @@ header > h1 {
 
 .stat {
     min-width: 115px;
-    border: 2px solid #ffffff;
+    border: 2px solid var(--white);
     border-radius: 4px;
     padding: 10px 14px;
     text-align: center;
-    color: #ffffff;
-    background: transparent;
+    color: var(--white);
 }
 
 .stat-label {
@@ -210,21 +227,20 @@ header > h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 4px solid #ffffff;
+    border: 4px solid var(--white);
     overflow: hidden;
 }
 
 .card-front {
-    background: linear-gradient(180deg, #4d4e56 0%, #43444b 100%);
-    color: #ffffff;
+    background: linear-gradient(180deg, var(--card-front-top) 0%, var(--card-front-bottom) 100%);
+    color: var(--white);
     font-size: 68px;
     font-weight: 700;
-    font-family: "Outfit", "Asap", sans-serif;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
 .card-back {
-    background: #ffffff;
+    background: var(--white);
     transform: rotateY(180deg);
 }
 
@@ -260,34 +276,20 @@ header > h1 {
 
 .controls {
     text-align: center;
-
 }
 
 .btn {
     padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    background: #E2584D;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: bold;
-    font-family: "Outfit", "Asap", sans-serif;
-    cursor: pointer;
-    transition: 0.3s ease;
 }
 
 .btn:hover {
-    background: #c94c42;
     transform: scale(1.06);
 }
 
 /* Dialog */
 .dialog {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -296,29 +298,28 @@ header > h1 {
 }
 
 .dialog-content {
-    background: #f5f5f5;
+    width: 90%;
+    max-width: 620px;
     padding: 42px 30px 34px;
     border-radius: 6px;
     text-align: center;
-    font-family: "Outfit", "Asap", sans-serif;
-    width: 90%;
-    max-width: 620px;
+    background: var(--dialog-bg);
 }
 
 .dialog-content.win {
-    border: 4px solid #4dcc7d;
+    border: 4px solid var(--win);
     box-shadow: 0 0 15px rgba(77, 204, 125, 0.4);
 }
 
 .dialog-content.lose {
-    border: 4px solid #fc121b;
+    border: 4px solid var(--lose);
     box-shadow: 0 0 15px rgba(252, 18, 27, 0.4);
 }
 
 .dialog-content p {
     font-size: 28px;
     font-weight: 800;
-    color: #292C34;
+    color: var(--bg-dark);
     margin-bottom: 26px;
     line-height: 1.3;
 }
@@ -328,8 +329,8 @@ header > h1 {
     max-width: 320px;
     margin: 0 auto 28px;
     padding: 18px 20px;
-    background: #ffffff;
-    border: 2px solid #d9d9d9;
+    background: var(--white);
+    border: 2px solid var(--border-light);
     border-radius: 6px;
 }
 
@@ -341,11 +342,11 @@ header > h1 {
     padding: 10px 0;
     font-size: 22px;
     font-weight: 700;
-    color: #292C34;
+    color: var(--bg-dark);
 }
 
 .dialog-stat-row:not(:last-child) {
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid var(--divider-light);
 }
 
 .dialog-buttons {
@@ -358,19 +359,6 @@ header > h1 {
 .dialog-content button {
     min-width: 180px;
     padding: 12px 24px;
-    border: none;
-    border-radius: 4px;
-    background: #E2584D;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: bold;
-    font-family: "Outfit", "Asap", sans-serif;
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.dialog-content button:hover {
-    background: #c94c42;
 }
 
 .hidden {
