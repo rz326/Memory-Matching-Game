@@ -1,0 +1,459 @@
+/* Global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #292C34;
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: "Outfit", "Asap", sans-serif;
+}
+
+/* Header */
+header {
+    background: #ffffff;
+    padding: 16px 20px;
+}
+
+header > h1 {
+    color: #292C34;
+    text-align: center;
+    font-family: "Asap", sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.5px;
+}
+
+/* Setup Page */
+.setup-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 60px;
+    padding: 0 20px;
+}
+
+.setup-form {
+    width: 90%;
+    max-width: 420px;
+    border: 3px solid #ffffff;
+    border-radius: 6px;
+    padding: 30px;
+    background-color: transparent;
+    color: #ffffff;
+    font-family: "Outfit", "Asap", sans-serif;
+}
+
+.setup-form h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 32px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.setup-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.setup-form input[type="text"],
+.setup-form input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: "Outfit", "Asap", sans-serif;
+    outline: none;
+}
+
+.setup-form input[type="text"]:hover,
+.setup-form input[type="number"]:hover,
+.setup-form input[type="text"]:focus,
+.setup-form input[type="number"]:focus {
+    background: #ffffe0;
+}
+
+.checkbox-group {
+    margin-bottom: 20px;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0 !important;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    transform: scale(1.2);
+}
+
+.setup-form button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background: #E2584D;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: "Outfit", "Asap", sans-serif;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.setup-form button:hover {
+    background: #c94c42;
+}
+
+/* Game Page */
+.container {
+    max-width: 760px;
+    margin: 22px auto 0;
+    padding: 0 20px 24px;
+}
+
+.boardHeader {
+    width: fit-content;
+    margin: 0 auto 24px;
+    border: 3px solid #ffffff;
+    border-radius: 6px;
+    padding: 14px 18px;
+    background: transparent;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    min-width: 115px;
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+    padding: 10px 14px;
+    text-align: center;
+    color: #ffffff;
+    background: transparent;
+}
+
+.stat-label {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 125px);
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.card {
+    width: 125px;
+    height: 160px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+}
+
+.card:hover {
+    transform: scale(1.06);
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card.flipped:hover {
+    transform: rotateY(180deg) scale(1.03);
+}
+
+.card.matched {
+    pointer-events: none;
+}
+
+.card.matched .card-back {
+    box-shadow: 0 0 12px rgba(77, 204, 125, 0.45);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid #ffffff;
+    overflow: hidden;
+}
+
+.card-front {
+    background: linear-gradient(180deg, #4d4e56 0%, #43444b 100%);
+    color: #ffffff;
+    font-size: 68px;
+    font-weight: 700;
+    font-family: "Outfit", "Asap", sans-serif;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.card-back {
+    background: #ffffff;
+    transform: rotateY(180deg);
+}
+
+.card-back img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+}
+
+.card.mismatch {
+    animation: shake 0.35s ease;
+}
+
+.card.just-matched {
+    animation: matchPop 0.35s ease;
+}
+
+@keyframes shake {
+    0% { transform: rotateY(180deg) translateX(0); }
+    20% { transform: rotateY(180deg) translateX(-6px); }
+    40% { transform: rotateY(180deg) translateX(6px); }
+    60% { transform: rotateY(180deg) translateX(-4px); }
+    80% { transform: rotateY(180deg) translateX(4px); }
+    100% { transform: rotateY(180deg) translateX(0); }
+}
+
+@keyframes matchPop {
+    0% { transform: rotateY(180deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.08); }
+    100% { transform: rotateY(180deg) scale(1); }
+}
+
+.controls {
+    text-align: center;
+
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #E2584D;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: "Outfit", "Asap", sans-serif;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    background: #c94c42;
+    transform: scale(1.06);
+}
+
+/* Dialog */
+.dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 20px;
+}
+
+.dialog-content {
+    background: #f5f5f5;
+    padding: 42px 30px 34px;
+    border-radius: 6px;
+    text-align: center;
+    font-family: "Outfit", "Asap", sans-serif;
+    width: 90%;
+    max-width: 620px;
+}
+
+.dialog-content.win {
+    border: 4px solid #4dcc7d;
+    box-shadow: 0 0 15px rgba(77, 204, 125, 0.4);
+}
+
+.dialog-content.lose {
+    border: 4px solid #fc121b;
+    box-shadow: 0 0 15px rgba(252, 18, 27, 0.4);
+}
+
+.dialog-content p {
+    font-size: 28px;
+    font-weight: 800;
+    color: #292C34;
+    margin-bottom: 26px;
+    line-height: 1.3;
+}
+
+.dialog-stats {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 28px;
+    padding: 18px 20px;
+    background: #ffffff;
+    border: 2px solid #d9d9d9;
+    border-radius: 6px;
+}
+
+.dialog-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #292C34;
+}
+
+.dialog-stat-row:not(:last-child) {
+    border-bottom: 1px solid #dddddd;
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.dialog-content button {
+    min-width: 180px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    background: #E2584D;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: "Outfit", "Asap", sans-serif;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.dialog-content button:hover {
+    background: #c94c42;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header > h1 {
+        font-size: 28px;
+    }
+
+    .container {
+        max-width: 620px;
+        margin-top: 20px;
+    }
+
+    .game-board {
+        grid-template-columns: repeat(3, 110px);
+        gap: 10px;
+    }
+
+    .card {
+        width: 110px;
+        height: 145px;
+    }
+
+    .stat {
+        min-width: 105px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .setup-form {
+        padding: 24px 20px;
+    }
+
+    .setup-form h2 {
+        font-size: 28px;
+    }
+
+    .container {
+        margin-top: 18px;
+        padding: 0 15px 20px;
+    }
+
+    .boardHeader {
+        padding: 14px;
+        margin-bottom: 20px;
+    }
+
+    .game-board {
+        grid-template-columns: repeat(2, 100px);
+        gap: 10px;
+    }
+
+    .card {
+        width: 100px;
+        height: 132px;
+    }
+
+    .stat {
+        min-width: 95px;
+        padding: 9px 10px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+
+    .dialog-content {
+        padding: 32px 20px;
+    }
+
+    .dialog-content p {
+        font-size: 21px;
+    }
+}
