@@ -252,7 +252,7 @@ Clear separation of concerns improves readability and maintainability.
 
 ## Live Demo
 
-Play the game here:
+Play the game here: https://funmemorymatchinggame.netlify.app/
 
 ---
 
